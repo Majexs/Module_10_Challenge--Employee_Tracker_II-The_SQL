@@ -1,13 +1,23 @@
 // Imports all the necessary dependencies & functions
 import inquirer from 'inquirer';
-import { QueryResult } from 'pg';
-import { pool, connectToDb } from './connection.js';
-import { viewDepartments, viewRoles, viewEmployees, addDepartment, addRole, addEmployee, updateEmployee, updateManagers, viewManagers, viewEmployeesByManager, deleteStuff, totalDepartmentBudget } from './SQL functions.js';
+import { connectToDb } from './connection.js';
+import { viewDepartments, 
+        viewRoles, 
+        viewEmployees, 
+        addDepartment, 
+        addRole, 
+        addEmployee, 
+        updateEmployee, 
+        updateManagers, 
+        viewManagers, 
+        viewEmployeesByManager, 
+        deleteStuff, 
+        totalDepartmentBudget } from './SQL functions.js';
 
 await connectToDb();
 
 // Function that lets you choose what to do with Departments, Roles, Employees
-const companyActions = (): void => {
+export const companyActions = (): void => {
 inquirer
     .prompt ([{
             type: 'list',
@@ -44,7 +54,6 @@ inquirer
             companyActions();
         } else if (answer.action === 'Add a role') {
             await addRole();
-            companyActions();
         } else if (answer.action === 'Add an employee') {
             await addEmployee();
             companyActions();

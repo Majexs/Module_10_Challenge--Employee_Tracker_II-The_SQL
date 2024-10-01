@@ -2,21 +2,23 @@
 import { pool, connectToDb } from './connection.js';
 import { QueryResult } from 'pg';
 import inquirer from 'inquirer';
+import { companyActions } from './index.js';
 
 await connectToDb();
 
-// View All Roles function
+// 'View All Departments' function
 const viewDepartments = (): any => {
-    pool.query(`Select * FROM department`, (err: Error, result: QueryResult) => {
+    pool.query(`Select department_id, department_name FROM department`, (err: Error, result: QueryResult) => {
         if (err) {
           console.log(err);
         } else {
-          console.table(result);
+            console.log('\n')
+            console.table(result.rows);
         }
       });
 }
 
-// View All Roles function
+// 'View All Roles' function
 const viewRoles = (): any => {
     pool.query(`Select * FROM role`, (err: Error, result: QueryResult) => {
         if (err) {
@@ -27,7 +29,7 @@ const viewRoles = (): any => {
       });
 }
 
-// View All Employees function
+// 'View All Employees' function
 const viewEmployees = (): any => {
     pool.query(`Select * FROM employee`, (err: Error, result: QueryResult) => {
         if (err) {
@@ -38,7 +40,7 @@ const viewEmployees = (): any => {
       });
 }
 
-// Add a Department function
+// 'Add a Department' function
 const addDepartment = (): any => {
     inquirer
         .prompt ([{
@@ -56,31 +58,63 @@ const addDepartment = (): any => {
         })
 }
 
+// Retrieve Department Names Function
+const getAllDepartments: Promise<any> = new Promise((resolve, reject) => {
+    pool.query(`SELECT department_name FROM department`, (err: Error, result: QueryResult) => {
+        if (err) {
+            console.log(err);
+            reject(err);
+        }
+        console.log(result.rows);
+       resolve (result.rows.map(obj => obj['department_name'])); 
+    })
+})
+
+
+// Retrieve Department IDs Function
+function getDepartmentId(department:string): Promise<any> {
+    return new Promise((resolve, reject) => {
+    pool.query(`SELECT department_id FROM department WHERE department_name = $1`, [department], (err: Error, result: QueryResult) => {
+        if (err) {
+            console.log(err);
+            reject(err);
+        } resolve (result.rows.map(obj => obj.department_id)[0]);
+    })
+})}
+
 // Add a Role function
-const addRole = (): any => {
-    inquirer
-        .prompt ([{
-                type: 'input',
-                name: 'role',
-                message: 'What is the name of the new role?'
-            },
-            {
-                type: 'input',
-                name: 'roleSalary',
-                message: 'What is the salary of the new role?'
-            }
-        ])
-        .then ((response: any) => {
-            pool.query(`INSERT INTO role (role_title, role_salary) VALUES ($1, $2)`, [response], (err: Error, result: QueryResult) => {
-                if (isNaN(response.roleSalary)) {
-                    console.log('Please enter salary as a number.')
-                } else if (err) {
-                    console.log(err);
-                } else {
-                    console.table(result);
-                }
-              });
-        })
+// ADD FUNCTIONALITY TO SPECIFY DEPARTMENT
+const addRole = async (): Promise<any> => {
+    let departments: any = await getAllDepartments;
+    console.log(departments)
+            inquirer
+                .prompt ([{
+                        type: 'input',
+                        name: 'role',
+                        message: 'What is the name of the new role?'
+                    },
+                    {
+                        type: 'input',
+                        name: 'roleSalary',
+                        message: 'What is the salary of the new role?'
+                    },
+                    {
+                        type: 'list',
+                        name: 'roleDepartment',
+                        message: 'To what department does this role belong?',
+                        choices: departments
+                    }
+                ])
+                .then (async (response: any) => {
+                    const deptId: any = await getDepartmentId(response.roleDepartment);
+                    pool.query(`INSERT INTO role (role_title, role_salary, department_id) VALUES ($1, $2, $3)`, [response.role, response.roleSalary, deptId], (err: Error, result: QueryResult) => {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.table(result);
+                                    companyActions();
+                            }}); 
+                        })
 }
 
 // Add an Employee function
@@ -206,11 +240,6 @@ const deleteStuff = (): any => {
             message: 'Select something to delete',
             choices: ['department', 'role', 'employee']
         },
-        {
-            type: 'input',
-            name: 'manager',
-            message: 'Who is their new manager?'
-        }
     ])
     .then ((response: any) => {
         pool.query(`INSERT INTO employee (role_title, role_salary) VALUES ($1, $2)`, [response], (err: Error, result: QueryResult) => {
@@ -226,7 +255,22 @@ const deleteStuff = (): any => {
 // Calculate Total Budget of a Department function
 // GTFO I CAN'T EVEN LOOK AT THIS NOW
 const totalDepartmentBudget = (): any => {
-
+    inquirer
+    .prompt ([{
+            type: 'input',
+            name: 'totalBudget',
+            message: 'Pick a department to view its total budget',
+        },
+    ])
+    .then ((response: any) => {
+        pool.query(`SELECT department, SUM(role_salary) AS sum_department FROM role GROUP BY ${response.totalBudget}.department_id;`, [response], (err: Error, result: QueryResult) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.table(result);
+            }
+          });
+    })
 }
 
 export { viewDepartments, viewRoles, viewEmployees, addDepartment, addRole, addEmployee, updateEmployee, updateManagers, viewManagers, viewEmployeesByManager, deleteStuff, totalDepartmentBudget };
