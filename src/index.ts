@@ -32,7 +32,7 @@ export const companyActions = (): any => {
                     'Add a department',
                     'Add a role',
                     'Add an employee',
-                    'Update an employee',
+                    'Update an employee role',
                     'Update employee managers',
                     'View employee managers',
                     'View employees by manager',
@@ -54,7 +54,7 @@ export const companyActions = (): any => {
                 await addRole();
             } else if (answer.action === 'Add an employee') {
                 await addEmployee();
-            } else if (answer.action === 'Update an employee') {
+            } else if (answer.action === 'Update an employee role') {
                 await updateEmployee();
             } else if (answer.action === 'Update employee managers') {
                 await updateManagers();

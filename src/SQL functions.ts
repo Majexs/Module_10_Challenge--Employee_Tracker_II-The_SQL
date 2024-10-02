@@ -275,7 +275,7 @@ const updateManagers = async (): Promise<any> => {
 // View Employee Managers function
 // STILL WORKING ON --------------------------------------------------->
 const viewManagers = (): any => {
-        pool.query(`SELECT manager_id FROM employee GROUP BY manager_id`, (err: Error, result: QueryResult) => {
+        pool.query(`SELECT manager_id FROM employee GROUP BY employee_id`, (err: Error, result: QueryResult) => {
             if (err) {
                 console.log(err);
             } else {
