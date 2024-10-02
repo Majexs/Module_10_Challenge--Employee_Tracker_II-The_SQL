@@ -41,31 +41,31 @@ export const companyActions = (): any => {
                 ],
             },
         ])
-        .then (async (answer: any) => {
+        .then ((answer: any) => {
             if (answer.action === 'View all departments') {
-                await viewDepartments();
+                viewDepartments();
             } else if (answer.action === 'View all roles') {
-                await viewRoles();
+                viewRoles();
             } else if (answer.action === 'View all employees') {
-                await viewEmployees();
+                viewEmployees();
             } else if (answer.action === 'Add a department') {
-                await addDepartment();
+                addDepartment();
             } else if (answer.action === 'Add a role') {
-                await addRole();
+                addRole();
             } else if (answer.action === 'Add an employee') {
-                await addEmployee();
+                addEmployee();
             } else if (answer.action === 'Update an employee role') {
-                await updateEmployee();
+                updateEmployee();
             } else if (answer.action === 'Update employee managers') {
-                await updateManagers();
+                updateManagers();
             } else if (answer.action === 'View employee managers') {
-                await viewManagers();
+                viewManagers();
             } else if (answer.action === 'View employees by manager') {
-                await viewEmployeesByManager();
+                viewEmployeesByManager();
             } else if (answer.action === 'Delete departments, roles, or employees') {
-                await deleteStuff();
+                deleteStuff();
             } else if (answer.action === 'Calculate total budget of a department') {
-                await totalDepartmentBudget();
+                totalDepartmentBudget();
             }
         })
 };

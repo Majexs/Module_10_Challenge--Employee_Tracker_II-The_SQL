@@ -127,7 +127,7 @@ const getAllEmployees: Promise<any> = new Promise((resolve, reject) => {
             console.log(err);
             reject(err);
         }
-       resolve (result.rows.map(obj => obj['employee_first_name'])); 
+       resolve (result.rows.map(obj => obj['employee_first_name'] + ' ' + obj['employee_last_name']));
     })
 })
 
@@ -147,7 +147,8 @@ const getAllRoles: Promise<any> = new Promise((resolve, reject) => {
 // Used in Add an Employee Function
 function getEmployeeId(employee:string): Promise<any> {
     return new Promise((resolve, reject) => {
-    pool.query(`SELECT employee_id FROM employee WHERE employee_first_name = $1`, [employee], (err: Error, result: QueryResult) => {
+    const firstName: any = employee.split(' ');
+    pool.query(`SELECT employee_id FROM employee WHERE employee_first_name = $1`, [firstName[0]], (err: Error, result: QueryResult) => {
         if (err) {
             console.log(err);
             reject(err);
@@ -306,11 +307,11 @@ const deleteStuff = async (): Promise<any> => {
             type: 'list',
             name: 'table',
             message: 'Select something to delete',
-            choices: ['department', 'role', 'employee']
+            choices: ['Department', 'Role', 'Employee']
         },
     ])
     .then ((response: any) => {
-        if (response.table === 'department') {
+        if (response.table === 'Department') {
             inquirer
             .prompt ([{
                 type: 'list',
@@ -330,7 +331,7 @@ const deleteStuff = async (): Promise<any> => {
                   });
             })
         }
-        if (response.table === 'role') {
+        if (response.table === 'Role') {
             inquirer
             .prompt ([{
                 type: 'list',
@@ -350,7 +351,7 @@ const deleteStuff = async (): Promise<any> => {
                   });
             })
         }
-        if (response.table === 'employee') {
+        if (response.table === 'Employee') {
             inquirer
             .prompt ([{
                 type: 'list',
